@@ -1,21 +1,49 @@
 {% extends 'guardian/base.html' %}
 {% block content %}
 <div class="flex gap-4">
-	<div class="w-1/4 h-96 bg-primary aspect-video">
-		<video src="https://download.samplelib.com/mp4/sample-5s.mp4" class="w-full h-full" />
+	<div class="w-1/4 h-96 rounded-lg bg-base-200 p-2 flex flex-col">
+		<video id="video" autoplay controls class="w-full h-full"></video>
+		<input type="file" name="file" id="file" />
+		<button id="upload" class="btn btn-primary">Upload</button>
 	</div>
 
-	<div class="w-1/4 h-20 bg-primary">
-
-	</div>
-
-	<div class="w-1/4 h-20 bg-primary">
-
-	</div>
-
-	<div class="w-1/4 h-20 bg-primary">
+	<div class="w-1/4 h-96 rounded-lg bg-base-200">
 
 	</div>
 
+	<div class="w-1/4 h-96 rounded-lg bg-base-200">
+
+	</div>
+
+	<div class="w-1/4 h-96 rounded-lg bg-base-200">
+
+	</div>
+
+	{% csrf_token %}
 </div>
+
+<script>
+	const button = document.getElementById('upload');
+	const video = document.getElementById('video');
+
+	button.onclick = async () => {
+		const file = document.getElementById('file').files[0];
+		const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('csrfmiddlewaretoken', csrf_token);
+
+		const response = await fetch('/guardian/upload', {
+			method: 'POST',
+			body: formData
+		});
+
+		const data = await response.arrayBuffer();
+		const blob = new Blob([ data ]);
+		const url = URL.createObjectURL(blob);
+
+		video.src = url;
+		console.log(data);
+	}
+</script>
 {% endblock %}
